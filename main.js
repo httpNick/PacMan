@@ -52,7 +52,7 @@ Ghost.prototype.update = function() {
         this.x = 400;
         this.y = 400;
         this.timeIt += 5;
-        if (this.timeIt >= 8000) {
+        if (this.timeIt >= 4000) {
             this.tempDead = false;
         }
     } else {
