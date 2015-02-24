@@ -320,101 +320,17 @@ Pacman.prototype.update = function() {
     this.velocity.x -= (1 - friction) * this.game.clockTick * this.velocity.x;
     this.velocity.y -= (1 - friction) * this.game.clockTick * this.velocity.y;
 };
-/*Circle.prototype.update = function () {
-    Entity.prototype.update.call(this);
-
- //  console.log(this.velocity);
-
-    this.x += this.velocity.x * this.game.clockTick;
-    this.y += this.velocity.y * this.game.clockTick;
-
-    if (this.collideLeft() || this.collideRight()) {
-        this.velocity.x = -this.velocity.x * friction;
-        if (this.collideLeft()) this.x = this.radius;
-        if (this.collideRight()) this.x = 800 - this.radius;
-        this.x += this.velocity.x * this.game.clockTick;
-        this.y += this.velocity.y * this.game.clockTick;
-    }
-
-    if (this.collideTop() || this.collideBottom()) {
-        this.velocity.y = -this.velocity.y * friction;
-        if (this.collideTop()) this.y = this.radius;
-        if (this.collideBottom()) this.y = 800 - this.radius;
-        this.x += this.velocity.x * this.game.clockTick;
-        this.y += this.velocity.y * this.game.clockTick;
-    }
-
-    for (var i = 0; i < this.game.entities.length; i++) {
-        var ent = this.game.entities[i];
-        if (ent !== this && this.collide(ent)) {
-            var temp = { x: this.velocity.x, y: this.velocity.y };
-
-            var dist = distance(this, ent);
-            var delta = this.radius + ent.radius - dist;
-            var difX = (this.x - ent.x)/dist;
-            var difY = (this.y - ent.y)/dist;
-
-            this.x += difX * delta / 2;
-            this.y += difY * delta / 2;
-            ent.x -= difX * delta / 2;
-            ent.y -= difY * delta / 2;
-
-            this.velocity.x = ent.velocity.x * friction;
-            this.velocity.y = ent.velocity.y * friction;
-            ent.velocity.x = temp.x * friction;
-            ent.velocity.y = temp.y * friction;
-            this.x += this.velocity.x * this.game.clockTick;
-            this.y += this.velocity.y * this.game.clockTick;
-            ent.x += ent.velocity.x * this.game.clockTick;
-            ent.y += ent.velocity.y * this.game.clockTick;
-            if (this.it) {
-                this.setNotIt();
-                ent.setIt();
-            }
-            else if (ent.it) {
-                this.setIt();
-                ent.setNotIt();
-            }
-        }
-
-        if (ent != this && this.collide({ x: ent.x, y: ent.y, radius: this.visualRadius })) {
-            var dist = distance(this, ent);
-            if (this.it && dist > this.radius + ent.radius + 10) {
-                var difX = (ent.x - this.x)/dist;
-                var difY = (ent.y - this.y)/dist;
-                this.velocity.x += difX * acceleration / (dist*dist);
-                this.velocity.y += difY * acceleration / (dist * dist);
-                var speed = Math.sqrt(this.velocity.x*this.velocity.x + this.velocity.y*this.velocity.y);
-                if (speed > maxSpeed) {
-                    var ratio = maxSpeed / speed;
-                    this.velocity.x *= ratio;
-                    this.velocity.y *= ratio;
-                }
-            }
-            if (ent.it && dist > this.radius + ent.radius) {
-                var difX = (ent.x - this.x) / dist;
-                var difY = (ent.y - this.y) / dist;
-                this.velocity.x -= difX * acceleration / (dist * dist);
-                this.velocity.y -= difY * acceleration / (dist * dist);
-                var speed = Math.sqrt(this.velocity.x * this.velocity.x + this.velocity.y * this.velocity.y);
-                if (speed > maxSpeed) {
-                    var ratio = maxSpeed / speed;
-                    this.velocity.x *= ratio;
-                    this.velocity.y *= ratio;
-                }
-            }
-        }
-    }
-
-
-    this.velocity.x -= (1 - friction) * this.game.clockTick * this.velocity.x;
-    this.velocity.y -= (1 - friction) * this.game.clockTick * this.velocity.y;
-}; */
 
 Pacman.prototype.draw = function (ctx) {
     if (this.isFeelingIt) {
         ctx.beginPath();
         ctx.fillStyle = this.colors[this.color];
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+        ctx.fill();
+        ctx.closePath();
+    } else if (this.isImmune) {
+        ctx.beginPath();
+        ctx.fillStyle = "red";
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
         ctx.fill();
         ctx.closePath();
@@ -441,15 +357,15 @@ ASSET_MANAGER.downloadAll(function () {
 
 
     var gameEngine = new GameEngine();
-    for (var i = 0; i < 3; i++) {
+    for (var i = 0; i < 10; i++) {
         var pacman = new Pacman(gameEngine, ASSET_MANAGER.getAsset("./img/pacmansprite.png"));
         gameEngine.addPacman(pacman);
     }
-    for (var i = 0; i < 3; i++) {
+    for (var i = 0; i < 10; i++) {
         var ghost = new Ghost(gameEngine, ASSET_MANAGER.getAsset("./img/pacmansprite.png"), (i % 5));
         gameEngine.addGhost(ghost);
     }
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < 12; i++) {
         var pellet = new PowerPellet(gameEngine);
         gameEngine.addPellet(pellet);
     }
