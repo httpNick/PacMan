@@ -93,7 +93,7 @@ GameEngine.prototype.draw = function () {
 GameEngine.prototype.update = function () {
     var entitiesCount = this.entities.length;
     this.pelletSpawner += 5;
-    if (this.pelletSpawner >= 10000) {
+    if (this.pelletSpawner >= 7500) {
         for (var i = 0; i < 5; i++) {
             var pellet = new PowerPellet(this);
             this.addPellet(pellet);
