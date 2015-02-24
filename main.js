@@ -352,6 +352,9 @@ ASSET_MANAGER.queueDownload("./img/pacmansprite.png");
 
 ASSET_MANAGER.downloadAll(function () {
     console.log("starting up da sheild");
+    var ost = new Audio("./Pacman Remix Theme.mp3");
+    ost.play();
+    ost.loop = true;
     var canvas = document.getElementById('gameWorld');
     var ctx = canvas.getContext('2d');
 
