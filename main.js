@@ -347,6 +347,7 @@ var acceleration = 100000;
 var maxSpeed = 200;
 
 var ASSET_MANAGER = new AssetManager();
+var gameEngine;
 
 ASSET_MANAGER.queueDownload("./img/pacmansprite.png");
 
@@ -359,7 +360,7 @@ ASSET_MANAGER.downloadAll(function () {
     var ctx = canvas.getContext('2d');
 
 
-    var gameEngine = new GameEngine();
+    gameEngine = new GameEngine();
     for (var i = 0; i < 10; i++) {
         var pacman = new Pacman(gameEngine, ASSET_MANAGER.getAsset("./img/pacmansprite.png"));
         gameEngine.addPacman(pacman);
@@ -374,4 +375,87 @@ ASSET_MANAGER.downloadAll(function () {
     }
     gameEngine.init(ctx);
     gameEngine.start();
+});
+$('document').ready(function() {
+    var ipAddress = '76.28.150.193';
+    var port = '8888';
+    var socket = io.connect('http://' + ipAddress + ':' + port);
+    socket.on("connect", function() {
+        $('#savethestate').submit(function (event) {
+            var nametosave = $('#savethestate').serializeArray()[0].value;
+            var pacmentosend = [];
+            var ghoststosend = [];
+            var pelletstosend = [];
+            var aSinglePacman;
+            var aSingleGhost;
+            var aSinglePellet;
+            for (var i = 0; i < gameEngine.pellets.length; i++) {
+                aSinglePellet = {x : gameEngine.pellets[i].x, y : gameEngine.pellets[i].y};
+                pelletstosend.push(aSinglePellet);
+            }
+            for (var i = 0; i < gameEngine.entities.length; i++) {
+                aSinglePacman = {x : gameEngine.entities[i].x, y : gameEngine.entities[i].y,
+                                    ishefeelingit : gameEngine.entities[i].isFeelingIt,
+                                    lives : gameEngine.entities[i].lives,
+                                    immunity : gameEngine.entities[i].isImmune,
+                                    isheFeelingitTimer : gameEngine.entities[i].feelingItTimer,
+                                    immunityTimer : gameEngine.entities[i].immuneTimer};
+                pacmentosend.push(aSinglePacman);
+            }
+            for (var i = 0; i < gameEngine.ghosts.length; i++) {
+                aSingleGhost = {x : gameEngine.ghosts[i].x, y: gameEngine.ghosts[i].y,
+                                    dead : gameEngine.ghosts[i].tempDead,
+                                    deadTimer : gameEngine.ghosts[i].timeIt,
+                                    lives : gameEngine.ghosts[i].lives,
+                                    which : gameEngine.ghosts[i].which};
+                ghoststosend.push(aSingleGhost);
+            }
+            var tosend = {pacmen : pacmentosend, ghosts : ghoststosend, pellets : pelletstosend};
+            socket.emit('save', {studentname : 'NickDuncan', statename : nametosave,
+            data : tosend});
+            event.preventDefault();
+        });
+        $('#loadthestate').submit(function (event) {
+           var nametoload = $('#loadthestate').serializeArray()[0].value;
+           socket.emit('load', {studentname : 'NickDuncan', statename : nametoload});
+           socket.on('load', function (data) {
+                console.log(data);
+               gameEngine.entities = [];
+               gameEngine.ghosts = [];
+               gameEngine.pellets = [];
+               var apacman, aghost, apellet;
+               for (var i = 0; i < data.data.pacmen.length; i++) {
+                   apacman = new Pacman(gameEngine, ASSET_MANAGER.getAsset("./img/pacmansprite.png"));
+                   apacman.x = data.data.pacmen[i].x;
+                   apacman.y = data.data.pacmen[i].y;
+                   apacman.isFeelingIt = data.data.pacmen[i].ishefeelingit;
+                   apacman.lives = data.data.pacmen[i].lives;
+                   apacman.isImmune = data.data.pacmen[i].immunity;
+                   apacman.feelingItTimer = data.data.pacmen[i].isheFeelingitTimer;
+                   apacman.immuneTimer = data.data.pacmen[i].immunityTimer;
+                   if (apacman.isFeelingIt) {
+                       apacman.color = 0;
+                   }
+                   gameEngine.entities.push(apacman);
+               }
+               for (var i = 0; i < data.data.ghosts.length; i++) {
+                   aghost = new Ghost(gameEngine, ASSET_MANAGER.getAsset("./img/pacmansprite.png"),
+                       data.data.ghosts[i].which);
+                   aghost.x = data.data.ghosts[i].x;
+                   aghost.y = data.data.ghosts[i].y;
+                   aghost.tempDead = data.data.ghosts[i].dead;
+                   aghost.timeIt = data.data.ghosts[i].deadTimer;
+                   aghost.lives = data.data.ghosts[i].lives;
+                   gameEngine.ghosts.push(aghost);
+               }
+               for (var i = 0; i < data.data.pellets.length; i++) {
+                   apellet = new PowerPellet(gameEngine);
+                   apellet.x = data.data.pellets[i].x;
+                   apellet.y = data.data.pellets[i].y;
+                   gameEngine.pellets.push(apellet);
+               }
+           });
+            event.preventDefault();
+        });
+    });
 });
