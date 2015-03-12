@@ -4,6 +4,8 @@
 <head>
     <meta charset="utf-8">
     <title>PacMan Simulator!</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="http://76.28.150.193:8888/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="./assetmanager.js"></script>
     <script type="text/javascript" src="./gameengine.js"></script>
     <script type="text/javascript" src="./main.js"></script>
@@ -12,5 +14,15 @@
     <div>Right click and "Inspect Element".  Select the Console Tab to see the debugger output.</div>
 
     <canvas id="gameWorld" width="800" height="800" style="border: 1px solid white; background: black"></canvas>
+    <form id="savethestate">
+        <label for='savestatename'>State name to be saved: </label>
+        <input name="savestatename" id="savestatename">
+        <button type="submit">save</button>
+    </form>
+    <form id="loadthestate">
+        <label for="loadstatename">State name to be loaded: </label>
+        <input name="loadstatename" id="loadstatename">
+        <button type="submit">load</button>
+    </form>
 </body>
 </html>
